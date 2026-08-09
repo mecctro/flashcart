@@ -1,0 +1,73 @@
+{
+  "name": "flashcart",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "clean": "rimraf .next out dist",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.3.2",
+    "@paypal/react-paypal-js": "^7.8.3",
+    "@radix-ui/react-icons": "^1.3.0",
+    "@stripe/stripe-js": "^2.1.11",
+    "@tailwindcss/postcss": "^4.3.3",
+    "clsx": "^2.0.0",
+    "graphql": "^16.8.1",
+    "graphql-request": "^6.1.0",
+    "lucide-react": "^0.294.0",
+    "next": "^16.3.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-hook-form": "^7.48.2",
+    "stripe": "^22.4.0",
+    "tailwind-merge": "^2.1.0",
+    "zod": "^3.22.4",
+    "zustand": "^4.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8",
+    "eslint-config-next": "14.1.0",
+    "postcss": "^8.4.31",
+    "prettier": "^3.1.1",
+    "prettier-plugin-tailwindcss": "^0.5.9",
+    "rimraf": "^5.0.5",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5"
+  },
+  "description": "A lightning-fast, production-grade headless e-commerce storefront built with Next.js 14+, TypeScript, Tailwind CSS, and GraphQL/REST API integration.",
+  "keywords": [
+    "nextjs",
+    "typescript",
+    "tailwindcss",
+    "e-commerce",
+    "stripe",
+    "paypal",
+    "graphql",
+    "headless",
+    "storefront"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/flashcart.git"
+  },
+  "homepage": "https://flashcart.vercel.app",
+  "bugs": {
+    "url": "https://github.com/your-username/flashcart/issues"
+  },
+  "author": "Your Name",
+  "license": "MIT"
+}
