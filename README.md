@@ -96,7 +96,7 @@ FlashCart/
 
 ```bash
 # 1️⃣ Clone
-git clone https://github.com/mecctro/flashcart.git
+git clone https://github.com/MatthewCaples/flashcart.git
 cd flashcart
 
 # 2️⃣ Install deps
@@ -233,7 +233,7 @@ docker run -p 3000:3000 --env-file .env.production flashcart
 
 ## 📄 License
 
-MIT © [mecctro](https://github.com/mecctro)
+MIT © [MatthewCaples](https://github.com/MatthewCaples)
 
 ---
 
