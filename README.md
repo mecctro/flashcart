@@ -96,8 +96,8 @@ FlashCart/
 
 ```bash
 # 1️⃣ Clone
-git clone https://github.com/<your-org>/FlashCart.git
-cd FlashCart
+git clone https://github.com/mecctro/flashcart.git
+cd flashcart
 
 # 2️⃣ Install deps
 npm ci
@@ -233,7 +233,7 @@ docker run -p 3000:3000 --env-file .env.production flashcart
 
 ## 📄 License
 
-MIT © [Your Name / Organization](https://github.com/your-org)
+MIT © [mecctro](https://github.com/mecctro)
 
 ---
 
