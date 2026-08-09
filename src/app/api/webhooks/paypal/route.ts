@@ -21,11 +21,23 @@ import { NextRequest, NextResponse } from 'next/server';
  * }
  */
 
+interface PayPalCapture {
+  id: string;
+  status?: string;
+  custom_id?: string;
+  amount?: { currency_code?: string; value?: string };
+}
+
+interface PayPalWebhookEvent {
+  event_type: string;
+  resource?: PayPalCapture;
+}
+
 export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
-    const body = await request.json();
+    const body = (await request.json()) as PayPalWebhookEvent;
     const event = body;
 
     console.log(`[PayPal Webhook] Received event: ${event.event_type}`);
@@ -39,6 +51,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     switch (event.event_type) {
       case 'PAYMENT.CAPTURE.COMPLETED': {
         const capture = event.resource;
+        if (!capture) break;
         console.log(`[PayPal] Payment completed: ${capture.id}`);
 
         // Fulfill the order
@@ -48,6 +61,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
       case 'PAYMENT.CAPTURE.DENIED': {
         const capture = event.resource;
+        if (!capture) break;
         console.warn(`[PayPal] Payment denied: ${capture.id}`);
         // Handle failed payment, notify customer, etc.
         break;
@@ -55,6 +69,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
       case 'PAYMENT.CAPTURE.PENDING': {
         const capture = event.resource;
+        if (!capture) break;
         console.log(`[PayPal] Payment pending: ${capture.id}`);
         // Handle pending payment (e.g., waiting for bank approval)
         break;
@@ -77,7 +92,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 /**
  * Fulfill a PayPal payment capture.
  */
-async function fulfillPayPalOrder(capture: any) {
+async function fulfillPayPalOrder(capture: PayPalCapture) {
   // TODO: Integrate with your order database
   // - Find order by capture.custom_id or PayPal metadata
   // - Mark as "paid"

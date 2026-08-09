@@ -1,8 +1,7 @@
-import type { Stripe } from 'stripe';
+import Stripe from 'stripe';
 import { NextRequest, NextResponse } from 'next/server';
 import { constructStripeEvent } from '@/lib/stripe';
 import { Readable } from 'node:stream';
-import { finished } from 'node:stream/promises';
 import { Buffer } from 'node:buffer';
 
 /**

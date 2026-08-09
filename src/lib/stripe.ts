@@ -1,37 +1,69 @@
-// Stripe utilities — conditionally import Stripe on server-side
+import Stripe from 'stripe';
+
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-let stripe: any = null;
+let _stripe: Stripe | null = null;
 
-// Helper to construct Stripe event for webhooks
-export function constructStripeEvent(payload: string, signature: string) {
-  if (!stripe) {
-    throw new Error('Stripe not initialized on server');
+function getStripe(): Stripe {
+  if (!stripeSecretKey) {
+    throw new Error('STRIPE_SECRET_KEY is not set in environment variables');
   }
+  if (!_stripe) {
+    _stripe = new Stripe(stripeSecretKey, {
+      apiVersion: '2026-07-29.dahlia',
+    });
+  }
+  return _stripe;
+}
 
-  return stripe.webhooks.constructEvent(payload, signature, stripeSecretKey);
+/** Verify a Stripe webhook signature (uses the whsec_ webhook secret). */
+export function constructStripeEvent(
+  payload: string,
+  signature: string
+): Stripe.Event {
+  if (!stripeWebhookSecret) {
+    throw new Error('STRIPE_WEBHOOK_SECRET is not set in environment variables');
+  }
+  return getStripe().webhooks.constructEvent(
+    payload,
+    signature,
+    stripeWebhookSecret
+  );
 }
 
 // ─── Payment helpers ──────────────────────────────────────────────────────────
 
+interface PaymentIntentParams {
+  amount: number; // in cents
+  currency: string;
+  metadata?: Stripe.MetadataParam;
+}
+
 export async function createPaymentIntent({
   amount,
   currency,
-  metadata = {},
-}: {
-  amount: number; // in cents
-  currency: string;
-  metadata?: Record<string, string>;
-}) {
-  if (!stripe) {
-    throw new Error('Stripe not initialized on server');
-  }
-
-  return stripe.paymentIntents.create({
+  metadata,
+}: PaymentIntentParams): Promise<Stripe.PaymentIntent> {
+  return getStripe().paymentIntents.create({
     amount,
     currency,
-    metadata,
+    ...(metadata ? { metadata } : {}),
   });
+}
+
+interface CheckoutItem {
+  price: string;
+  quantity: number;
+  metadata?: Stripe.MetadataParam;
+}
+
+interface CheckoutSessionParams {
+  items: CheckoutItem[];
+  successUrl: string;
+  cancelUrl: string;
+  customerEmail?: string;
+  metadata?: Stripe.MetadataParam;
 }
 
 export async function createCheckoutSession({
@@ -39,54 +71,15 @@ export async function createCheckoutSession({
   successUrl,
   cancelUrl,
   customerEmail,
-  metadata = {},
-}: {
-  items: Array<{
-    price: string;
-    quantity: number;
-    metadata?: Record<string, string>;
-  }>;
-  successUrl: string;
-  cancelUrl: string;
-  customerEmail?: string;
-  metadata?: Record<string, string>;
-}) {
-  if (!stripe) {
-    throw new Error('Stripe not initialized on server');
-  }
-
-  const sessionParams: any = {
+  metadata,
+}: CheckoutSessionParams): Promise<Stripe.Checkout.Session> {
+  return getStripe().checkout.sessions.create({
     payment_method_types: ['card'],
     line_items: items,
     mode: 'payment',
     success_url: successUrl,
     cancel_url: cancelUrl,
-    metadata,
-  };
-
-  if (customerEmail) {
-    sessionParams.customer_email = customerEmail;
-  }
-
-  return stripe.checkout.sessions.create(sessionParams);
-}
-
-// ─── Type re-exports ──────────────────────────────────────────────────────────
-
-export type StripeTypes = {
-  PaymentIntent: any;
-  CheckoutSession: any;
-};
-
-// ─── Server-side initialization ────────────────────────────────────────────────
-
-if (typeof window === 'undefined') {
-  // Server-side — import Stripe
-  import('stripe').then((StripeModule) => {
-    const StripeConstructor = (StripeModule as any).default || StripeModule;
-    stripe = new StripeConstructor(stripeSecretKey, {
-      apiVersion: '2026-07-29.dahlia' as any,
-      typescript: true,
-    });
+    ...(metadata ? { metadata } : {}),
+    ...(customerEmail ? { customer_email: customerEmail } : {}),
   });
 }
